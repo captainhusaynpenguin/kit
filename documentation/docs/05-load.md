@@ -2,19 +2,27 @@
 title: Loading data
 ---
 
-A [`+page.svelte`](/docs/routing#page-page-svelte) or [`+layout.svelte`](/docs/routing#layout-layout-svelte) gets its `data` from a `load` function.
+Usually, your [`+page.svelte`](/docs/routing#page-page-svelte) or [`+layout.svelte`](/docs/routing#layout-layout-svelte) need to be loaded up with informations before initializtion. SvelteKit will automatically shares the information pushes the information down from the higher priority to lower priority end-points. For example, from the server-side down to the browser-side.
 
-If the `load` function is defined in `+page.js` or `+layout.js` it will run both on the server and in the browser. If it's instead defined in `+page.server.js` or `+layout.server.js` it will only run on the server, in which case it can (for example) make database calls and access private [environment variables](/docs/modules#$env-static-private), but can only return data that can be serialized with [devalue](https://github.com/rich-harris/devalue). In both cases, the return value (if there is one) must be an object.
+You need define a `load` function on the higher priority end point the return value of which will be accessible on the lower order end-piont via a `data` variable. The `data` variable is, of course, defined as an empty export on the lower order end-point 
 
 ```js
 /// file: src/routes/+page.js
 /** @type {import('./$types').PageLoad} */
 export function load(event) {
 	return {
-		some: 'data'
+		some: 'information to pass down to browser'
 	};
 }
 ```
+
+```svelte
+/// file: src/routes/+page.svelte
+export let data;
+console.log(data.some); // `information to pass down to browser`
+```
+
+If the `load` function is defined in `+page.js` or `+layout.js` it will run both on the server and in the browser. If it's instead defined in `+page.server.js` or `+layout.server.js` it will only run on the server, in which case it can (for example) make database calls and access private [environment variables](/docs/modules#$env-static-private), but can only return data that can be serialized with [devalue](https://github.com/rich-harris/devalue). In both cases, the return value (if there is one) must be an object.
 
 ### Input properties
 
